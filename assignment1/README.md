@@ -39,6 +39,10 @@ This project demonstrates how to automate the management of Amazon EC2 instances
 - Add tags:
   - Instance 1 → `Key: Action`, `Value: Auto-Stop`
   - Instance 2 → `Key: Action`, `Value: Auto-Start`
+ 
+![EC2 Instances](screenshots/manageEC2InstanceTag.png)
+
+![EC2 Instances](screenshots/addTagToEC2Instance.png)
 
 ---
 
@@ -48,6 +52,8 @@ This project demonstrates how to automate the management of Amazon EC2 instances
 - Attach the policy:  
   - `AmazonEC2FullAccess` (for simplicity; in production, use least privilege).
 - Save the role.
+![IAM Role](screenshots/iamRolePolicy.png)
+
 
 ---
 
@@ -56,9 +62,13 @@ This project demonstrates how to automate the management of Amazon EC2 instances
 - Create a new function:
   - Runtime: **Python 3.x**
   - Execution Role: Select the IAM role created above.
+
+ ![Lambda](screenshots/createLambdaWithExistingRole.png)
+
+
 - Add the following code:
 
-```python
+```
 import boto3
 
 def lambda_handler(event, context):
@@ -93,18 +103,29 @@ def lambda_handler(event, context):
 
 ```
 
+ ![Lambda](screenshots/lambdafunctionExecution.png) 
+
 ---
 
 ### 4. Testing
 - Save the Lambda function.
+- Create a test. For creating test follow below and then test lambda function
+ ![Lambda](screenshots/lambdafunctionTest.png)
+
 - Manually **invoke** it from the Lambda console.
 - Check the **EC2 Dashboard**:
   - Instance tagged `Auto-Stop` → should be **stopped**.
   - Instance tagged `Auto-Start` → should be **running**.
- 
+
+#### EC2 insatnces before lambda execution -
+  ![EC2 Instance](screenshots/instanceinitialstate.png) 
 
 
-Lambda Output 
+#### EC2 insatnces after lambda execution -
+  ![EC2 Instance](screenshots/instancestateafterlambdaexecution.png) 
+
+
+#### Lambda console Output 
 ```
 Status: Succeeded
 Test Event Name: EC2TagTest
@@ -112,28 +133,20 @@ Test Event Name: EC2TagTest
 Response:
 {
   "statusCode": 200,
-  "body": "Stopped: ['i-05d42209f1b34c4bb', 'i-0d5bb4de7cf421c66', 'i-021a6cf1eb540f90b', 'i-0bf001e5899eddd95', 'i-0f05a0599cd2d2ff0', 'i-0064a442493e69d7d', 'i-0559985e3914d045e'], Started: ['i-07a4df29fcf5817d5', 'i-0bc7f0e23e427de08', 'i-0e5156ed3fb463336', 'i-0be43ed33334fc3c2', 'i-0ca33853f962a802a', 'i-0f2665b84d5c02850', 'i-0110b5e358e5ad6b3', 'i-075f9838ffa519dfc']"
+  "body": "Stopped: ['i-0559985e3914d045e'], Started: ['i-075f9838ffa519dfc']"
 }
 
 The area below shows the last 4 KB of the execution log.
 
 Function Logs:
 START RequestId: c6e4a173-9c68-4bb1-9198-468752f656bf Version: $LATEST
-Stopped instances: ['i-05d42209f1b34c4bb', 'i-0d5bb4de7cf421c66', 'i-021a6cf1eb540f90b', 'i-0bf001e5899eddd95', 'i-0f05a0599cd2d2ff0', 'i-0064a442493e69d7d', 'i-0559985e3914d045e']
-Started instances: ['i-07a4df29fcf5817d5', 'i-0bc7f0e23e427de08', 'i-0e5156ed3fb463336', 'i-0be43ed33334fc3c2', 'i-0ca33853f962a802a', 'i-0f2665b84d5c02850', 'i-0110b5e358e5ad6b3', 'i-075f9838ffa519dfc']
+Stopped instances: ['i-0559985e3914d045e']
+Started instances: ['i-075f9838ffa519dfc']
 END RequestId: c6e4a173-9c68-4bb1-9198-468752f656bf
 REPORT RequestId: c6e4a173-9c68-4bb1-9198-468752f656bf	Duration: 2122.46 ms	Billed Duration: 2123 ms	Memory Size: 128 MB	Max Memory Used: 100 MB
 
 Request ID: c6e4a173-9c68-4bb1-9198-468752f656bf
 
-```
-
----
-
-## 📂 Project Structure
-```
-├── README.md        # Documentation
-└── lambda_function.py # Lambda function code
 ```
 
 ---
@@ -156,4 +169,3 @@ After invoking the Lambda function:
 - [AWS Lambda Documentation](https://docs.aws.amazon.com/lambda/latest/dg/welcome.html)
 - [Boto3 EC2 Documentation](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/ec2.html)
 - [IAM Roles for Lambda](https://docs.aws.amazon.com/lambda/latest/dg/lambda-intro-execution-role.html)
-you like me to also create a **sample IAM policy JSON** (least-privilege version) so you can replace `AmazonEC2FullAccess` with a more secure setup in your README?
